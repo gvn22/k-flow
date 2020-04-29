@@ -51,22 +51,25 @@ ncc.meta['x']['constant']           = True
 ncc['g']                            = A1*np.cos(y) + 4.0*A4*np.cos(4.0*y)
 gql.parameters['F']                 = ncc
 
-# lo modes
-gql.add_equation("dt(zelo) - nu*L(zelo) - beta*dx(silo) = - J(silo,zelo) - J(sihi,zehi) + F", condition = "(abs(nx) <= 0) and (ny != 0)") 
-gql.add_equation("L(silo) - zelo = 0", condition = "(abs(nx) <= 0) and (ny != 0)")
+# set nx condition manually to vary cutoff
+# cutoff parameterised in develop branch
 
-gql.add_equation("zelo = 0", condition = "(abs(nx) > 0) and (ny != 0)")
-gql.add_equation("silo = 0", condition = "(abs(nx) > 0) and (ny != 0)")
+# lo modes
+gql.add_equation("dt(zelo) - nu*L(zelo) - beta*dx(silo) = - J(silo,zelo) - J(sihi,zehi) + F", condition = "(abs(nx) <= 3) and (ny != 0)") 
+gql.add_equation("L(silo) - zelo = 0", condition = "(abs(nx) <= 3) and (ny != 0)")
+
+gql.add_equation("zelo = 0", condition = "(abs(nx) > 3) and (ny != 0)")
+gql.add_equation("silo = 0", condition = "(abs(nx) > 3) and (ny != 0)")
 
 gql.add_equation("zelo = 0", condition = "(ny == 0)")
 gql.add_equation("silo = 0", condition = "(ny == 0)")
 
 # hi modes
-gql.add_equation("dt(zehi) - nu*L(zehi) - beta*dx(sihi) = - J(sihi,zelo) - J(silo,zehi) + F", condition = "(abs(nx) > 0) and (ny != 0)") 
-gql.add_equation("L(sihi) - zehi = 0", condition = "(abs(nx) > 0) and (ny != 0)")
+gql.add_equation("dt(zehi) - nu*L(zehi) - beta*dx(sihi) = - J(sihi,zelo) - J(silo,zehi) + F", condition = "(abs(nx) > 3) and (ny != 0)") 
+gql.add_equation("L(sihi) - zehi = 0", condition = "(abs(nx) > 3) and (ny != 0)")
 
-gql.add_equation("zehi = 0", condition = "(abs(nx) <= 0) and (ny != 0)")
-gql.add_equation("sihi = 0", condition = "(abs(nx) <= 0) and (ny != 0)")
+gql.add_equation("zehi = 0", condition = "(abs(nx) <= 3) and (ny != 0)")
+gql.add_equation("sihi = 0", condition = "(abs(nx) <= 3) and (ny != 0)")
 
 gql.add_equation("zehi = 0", condition = "(ny == 0)")
 gql.add_equation("sihi = 0", condition = "(ny == 0)")
