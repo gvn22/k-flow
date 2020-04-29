@@ -9,6 +9,13 @@ Then type:
 mpirun -np X python3 k-flow.py
 
 ```
+or
+
+Set cores etc in script and type:
+```terminal
+./run_simulation.sh
+
+```
 
 ## Contact
-For contributions and error reports email me: matgvn@leeds.ac.uk
+To contribute or report errors, email: matgvn@leeds.ac.uk
