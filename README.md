@@ -8,4 +8,4 @@ mpirun -np X python3 k-flow.py
 ```
 
 ## Contact
-For contributions and error reports email me: matgvn@leeds.ac.uk
+To contribute or report errors, email: matgvn@leeds.ac.uk

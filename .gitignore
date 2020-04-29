@@ -1,2 +1,4 @@
 series/
 snapshots/
+
+*.DS_Store
