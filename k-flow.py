@@ -21,14 +21,22 @@ logger = logging.getLogger(__name__)
 from mpi4py import MPI
 
 import time
+import yaml
 
-Nx,Ny  = (512,512)                  # modes
-Lx,Ly  = (2.0*np.pi,2.0*np.pi)      # dimensions
+with open(r'input.yaml') as file:
+    params = yaml.load(file, Loader=yaml.FullLoader)
 
-A1  = -1.0
-A4  = -2.0
 
-cutoff = 3
+Nx,Ny   = (params['nx'],params['ny'])            # modes
+Lx,Ly   = (2.0*np.pi,2.0*np.pi)                  # dimensions
+
+cutoff  = params['lambda']
+
+A1      = float(params['a1'])
+A4      = float(params['a2'])
+
+nu      = float(params['nu'])
+beta    = float(params['beta'])
 
 x_basis = de.Fourier('x', Nx, interval=(0.0,Lx), dealias=3/2)
 y_basis = de.Fourier('y', Ny, interval=(0.0,Ly), dealias=3/2)  
@@ -37,23 +45,20 @@ domain  = de.Domain([x_basis, y_basis], grid_dtype=np.float64)
 # zelo/zehi: relative vorticity, silo/sihi: streamfunction
 gql = de.IVP(domain, variables=['zelo','zehi','silo','sihi','u','v'],time='t')
 
-gql.parameters['nu']            = 0.03                          # kinematic viscosity
-gql.parameters['beta']          = 0.0                           # Coriolis paramater
-# gql.parameters['A1']            = -1.0
-# gql.parameters['A4']            = -2.0
+gql.parameters['nu']            = nu                            # kinematic viscosity
+gql.parameters['beta']          = beta                          # Coriolis paramater
 
 gql.substitutions['J(A,B)']     = "dx(A)*dy(B) - dy(A)*dx(B)"   # Jacobian
 gql.substitutions['L(A)']       = "dx(dx(A)) + dy(dy(A))"       # Laplacian
 
 # two-scale Kolmogorov forcing
-# x                                   = domain.grid(0)
 y                                   = domain.grid(1)
 ncc                                 = domain.new_field()
 ncc.meta['x']['constant']           = True
 ncc['g']                            = A1*np.cos(y) + 4.0*A4*np.cos(4.0*y)
 gql.parameters['F']                 = ncc
 
-# lo modes
+# low modes
 gql.add_equation("dt(zelo) - nu*L(zelo) - beta*dx(silo) = - J(silo,zelo) - J(sihi,zehi) + F", condition = f"(abs(nx) <= {cutoff}) and (ny != 0)") 
 gql.add_equation("L(silo) - zelo = 0", condition = f"(abs(nx) <= {cutoff}) and (ny != 0)")
 
@@ -63,7 +68,7 @@ gql.add_equation("silo = 0", condition = f"(abs(nx) > {cutoff}) and (ny != 0)")
 gql.add_equation("zelo = 0", condition = "(ny == 0)")
 gql.add_equation("silo = 0", condition = "(ny == 0)")
 
-# hi modes
+# high modes
 gql.add_equation("dt(zehi) - nu*L(zehi) - beta*dx(sihi) = - J(sihi,zelo) - J(silo,zehi) + F", condition = f"(abs(nx) > {cutoff}) and (ny != 0)") 
 gql.add_equation("L(sihi) - zehi = 0", condition = f"(abs(nx) > {cutoff}) and (ny != 0)")
 
