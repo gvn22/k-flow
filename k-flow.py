@@ -111,7 +111,7 @@ series = solver.evaluator.add_file_handler('series', sim_dt=1e-1, max_writes=100
 series.add_task("integ(integ(u**2 + v**2,'x'),'y')", name='ke')
 series.add_task("integ(integ((zelo + zehi)**2,'x'),'y')", name='enstrophy')
 
-flow = flow_tools.GlobalFlowProperty(solver, cadence=100)
+flow = flow_tools.GlobalFlowProperty(solver, cadence=10)
 flow.add_property("(zelo + zehi)**2.0", name='enstrophy')
 flow.add_property("u**2.0 + v**2.0", name='ke')
 
